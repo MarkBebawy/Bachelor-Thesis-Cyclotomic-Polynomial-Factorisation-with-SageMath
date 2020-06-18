@@ -7,10 +7,6 @@ For my bachelor's thesis, I studied the applications of locally decodable codes 
 ### Abstract of thesis
 [Abstract]
 
-### Schematic overview of thesis
-![Thesis Overview](/images/overviewThesis.png)
-The code in this repository concerns itself around the cyclotomic polynomial node and its link to matching vector codes.
-
 ### Files content
 #### Cyclotomic Polynomial Factorisation-v4.ipynb
 - This notebook contains all code used for factoring cyclotomic polynomials, running large experiments and analysing the strength of the results. This file also contains a systematic approach of how I analysed the results and what I conjectured/concluded from these results.
@@ -28,3 +24,7 @@ The code in this repository concerns itself around the cyclotomic polynomial nod
 The usage is explained in the comments of the Jupyter notebooks. There is one experiment class and one strength analysis class.
 The header comments of both classes contain an elaborate explanation of the way to initialise and use these classes.
 Furthermore, both notebooks contain usage examples (the complete notebook with the results contains the most examples).
+
+### Schematic overview of thesis
+![Thesis Overview](/images/overviewThesis.png)
+The code in this repository concerns itself around the cyclotomic polynomial node and its link to matching vector codes.
