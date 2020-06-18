@@ -23,3 +23,8 @@ The code in this repository concerns itself around the cyclotomic polynomial nod
 
 #### 'csvFiles/'
 - results of 30+ hours of cyclotomic polynomial factorisations (see the notebooks above for more details).
+
+### Usage
+The usage is explained in the comments of the Jupyter notebooks. There is one experiment class and one strength analysis class.
+The header comments of both classes contain an elaborate explanation of the way to initialise and use these classes.
+Furthermore, both notebooks contain usage examples (the complete notebook with the results contains the most examples).
