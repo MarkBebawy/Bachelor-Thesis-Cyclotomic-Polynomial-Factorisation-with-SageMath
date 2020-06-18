@@ -2,11 +2,24 @@
 ## Cyclotomic Polynomial Factorisation with SageMath
 Read the thesis: [URL]
 
-For my bachelor's thesis, I studied the applications of locally decodable codes to additive combinatorics and I analysed a recent refutation of a conjecture from higher-order Fourier analysis concerning dual functions and their approximations in terms of polynomial phase functions. This code constitutes my contributions to this refutation, as cyclotomic polynomial factorisation is tightly linked to the search for stronger and more general counterexample. My results motivated the conjecture that there are counterexamples for all prime numbers strictly larger than 5.
+For my bachelor's thesis, I studied the applications of locally decodable codes to additive combinatorics and I analysed a recent refutation of a conjecture from higher-order Fourier analysis concerning dual functions and their approximations in terms of polynomial phase functions. This code constitutes my contributions to this refutation, as cyclotomic polynomial factorisation is tightly linked to the search for stronger and more general counterexamples. My results motivated the conjecture that there are counterexamples for all prime numbers strictly larger than 5.
 
-### Abstract
+### Abstract of thesis
 [Abstract]
 
 ### Schematic overview of thesis
 ![Thesis Overview](/images/overviewThesis.png)
 The code in this repository concerns itself around the cyclotomic polynomial node and its link to matching vector codes.
+
+### Files content
+#### Cyclotomic Polynomial Factorisation-v4.ipynb
+- This notebook contains all code used for factoring cyclotomic polynomials, running large experiments and analysing the strength of the results. This file also contains a systematic approach of how I analysed the results and what I conjectured/concluded from these results.
+
+#### Cyclotomic Polynomial Factorisation-v4-CODE_ONLY.ipynb
+- This notebook contains the same code as in the notebook above, but without the elaborate discussion about the results. Use this file to run your own cylotomic polynomial factorisation experiments.
+
+#### 'images/'
+- overviewThesis.png: the image used above
+
+#### 'csvFiles/'
+- results of 30+ hours of cyclotomic polynomial factorisations (see the notebooks above for more details).
