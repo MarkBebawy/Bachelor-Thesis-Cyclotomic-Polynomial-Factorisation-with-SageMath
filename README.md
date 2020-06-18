@@ -14,6 +14,9 @@ For my bachelor's thesis, I studied the applications of locally decodable codes 
 #### Cyclotomic Polynomial Factorisation-v4-CODE_ONLY.ipynb
 - This notebook contains the same code as in the notebook above, but without the elaborate discussion about the results. Use this file to run your own cylotomic polynomial factorisation experiments.
 
+### cycloFact.py
+- Same code as above, but without example and just a python file, for the people that don't prefer to use jupyter notebooks.
+
 #### 'images/'
 - overviewThesis.png: the image used above
 
