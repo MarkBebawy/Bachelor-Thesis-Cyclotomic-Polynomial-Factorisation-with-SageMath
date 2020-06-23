@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import csv
 import os
 
+# -------------------------- CYCLOTOMIC FACTORISATION CLASS --------------------------
 class CycloFactExperiment:
     """This class allows the execution and analysis of numerical experiments concerning the factorisation
     of p-th cyclotomic polynomials (p prime) over finite fields (see docstring of __init__ function
@@ -10,7 +11,7 @@ class CycloFactExperiment:
     Dependency:
         - SageMath (https://www.sagemath.org/)
     Usage:
-        - Create a folder calles 'csvFiles' in the same directory as this file.
+        - Create a folder called 'csvFiles' in the same directory as this file.
         - Initialise a cycloFactExperiment object:
             cfexp = CycloFactExperiment(fileName, read, numPrimes, primeList, numFields, fieldList,
             showTrace) see docstring of __init__ for the meaning of these parameters.
@@ -24,10 +25,10 @@ class CycloFactExperiment:
             files in csvFiles/ (the files must exist)
 
             The rows in each file consist of (p, qMin, minSupp, order, bool) where the {p}-th
-            cyclotomic polynomial is factored into irreducible factors and FF_{qMin} was a
-            field that gave a sparse factor (the sparsest in fileNameSPARSEST.csv), namely
-            sparsity {minSupp}. Furthermore, {order} is ord_{p}({qMin}) and {bool} is True if
-            and only if this is a valid counterexample (i.e., if {minSupp} <= ord_{p}({qMin})).
+            cyclotomic polynomial is factored over FF_{qMin} into irreducible factors, one of
+            which was a sparse factor, namely sparsity {minSupp}. Furthermore, {order} is
+            ord_{p}({qMin}) and {bool} is True if and only if this is a valid counterexample
+            (i.e., if {minSupp} <= ord_{p}({qMin})).
         - cfexp.plotSparsest() and cfexp.plotAll() shows a graph of {qMin} plotted against {p} for the
           sparsest (respectively all) counterexamples.
         - cfexp.plotStrength(ylim, strengthFunc, ylabel)
@@ -53,11 +54,11 @@ class CycloFactExperiment:
         """
             Initialise a cycloFact object to conduct numerical experiments. For every prime p in primeList,
             this class allows to factor the p-th cyclotomic polynomial into irreducible factors
-            over all fields with order q, specified by fieldList, and store the q that gives the sparsest
+            over finite fields, with order q specified by fieldList, and store the q that gives the sparsest
             factor with sparsity at most the multiplicative order of q modulo p. A table is generated that
             stores the 'optimal' q for every p, with the corresponding sparsity, as well as a table that
-            stores all factorisations with sparsity <= order. For p Mersenne the behaviour
-            is understanded well, hence these primes are filtered out from the list of primes.
+            stores all factorisations with sparsity <= order. For p Mersenne, the behaviour
+            is understood well, hence these primes are filtered out from the list of primes.
 
             Parameters:
             - fileName: name of the csv-file in which data will be stored or from which data will be read.
@@ -90,7 +91,7 @@ class CycloFactExperiment:
 
     
     def multOrder(self, p, r):
-        """Calculate ord_p(r), (i.e. the multiplicative order of r in Z/pZ) or return p + 1
+        """Calculate ord_p(r), (i.e. the multiplicative order of r in (Z/pZ)^*) or return p + 1
         when this is not well-defined."""
         Zp = Integers(p)
         order = p + 1 if Zp(r) == Zp(0) else Zp(r).multiplicative_order()
@@ -175,14 +176,15 @@ class CycloFactExperiment:
         """This function factors the {p}-th cyclotomic polynomial
         over different finite fields (fields with number of elements in {facFields})
         and returns the field and the factorisation that has the most sparse
-        irreducible factor. All valid counterexamples are appended to self.allCounterExmpls.
+        irreducible factor. All valid counterexamples found
+        are appended to self.allCounterExmpls.
         Parameters:
         - p: determines the 'p'-th cyclotomic polynomial that will be factored
-        - facFields: list of primes, fields with these number of elements
-                     will be considered.
+        - facFields: list of primes, p-th cyclotomic polynomial will be factored over
+                     fields with these number of elements.
         Return value (three-tuple):
-        - qMin: number of elements of the field for which the most sparse irreducible factor
-                was found (element of facFields).
+        - qMin: number of elements of the field for which the most sparse irreducible
+                factor was found (element of facFields).
         - absMinSup: the support size of this sparsest irreducible factor
         - order: Multiplicative order of qMin in Z/pZ.
         """
@@ -190,14 +192,13 @@ class CycloFactExperiment:
         assert(p in self.primes)
         (qMin, absMinSup, minOrder) = (0, 0, p + 1)
         
-        # For every number of elements in facFields, create the field, polynomial ring and
-        # factor the p-th cyclotomic polynomial
+        # For every number of elements q in facFields, factor the
+        # p-th cyclotomic polynomial over F_q.
         for q in facFields:
             (qFactor, factorsSupp, minSupp) = self.factorCyclo(p, q)
             
-            # Calculate multiplicative order of qMin in Z/pZ
-            Zp = Integers(p)
-            order = p + 1 if Zp(q) == Zp(0) else Zp(q).multiplicative_order()
+            # Calculate multiplicative order of q in Z/pZ
+            order = self.multOrder(p, q)
             
             # Check whether case is interesting (that is, when minSupp <= ord_p(q)) and
             # add to list of counterexamples
@@ -215,7 +216,7 @@ class CycloFactExperiment:
     def calcPrimeSparsePairs(self):
         """This function loops over each prime p in self.primeList and factorises
         the p-th cyclotomic polynomial over the fields F_q for q in self.fieldList.
-        For each p this adds (p, qMin, minSup, order) to self.bestCounterExmpls,
+        For each p, this adds (p, qMin, minSup, order) to self.bestCounterExmpls,
         where F_{qMin} is the field that gave the sparsest irreducible factor
         of the p-th cyclotomic polynomial, {minSup} is the support size of that
         factor and order is ord_{p}({qMin}).
@@ -231,14 +232,15 @@ class CycloFactExperiment:
             if self.showTrace:
                 print(f"p = {p}", end=('.' if p == self.primeList[-1] else ', '))
 
-            # Only interesting fields F_q are the ones where ord_p(q) < p - 1 (otherwise p-th cyclotomic
-            # polynomial is irreducible with maximal sparsity)
-            goodFields = [q for q in self.fieldList if (p != q and self.multOrder(p, q) < p - 1)]
+            # Only interesting fields F_q are the ones where ord_p(q) \notin {1, 2, p - 1}
+            # (for the other cases there is no counterexample, see thesis).
+            goodFields = [q for q in self.fieldList
+                          if (p != q and (not self.multOrder(p, q) in [1, 2, p - 1]))]
             (qMin, minSup, order) = self.sparsestField(p, goodFields)
             self.bestCounterExmpls.append((p, qMin, minSup, order))
 
 
-    ## Note: The functions below should be used after initialisation
+    ## Note: The functions below are meant to be used after initialisation
     def runExperiment(self):
         """This function runs the cyclotomic polynomial factoring experiment."""
         if self.read:
@@ -257,8 +259,9 @@ class CycloFactExperiment:
     
     
     def searchHighOrder(self, read=None, fileName=None, primeList=None):
-        """For each prime p in primeList, this function loops over the first 10.000 primes for q
-        and factors the p-th cyclotomic polynomial over F_q for the smallest q of order (p - 1)/2."""
+        """For each prime p in primeList, this function loops over the first
+        10.000 primes for q and factors the p-th cyclotomic polynomial over
+        F_q, for the smallest q of order (p - 1)/2."""
         if read is None:
             read = self.read
         if fileName is None:
@@ -269,6 +272,8 @@ class CycloFactExperiment:
         if read:
             return self.read_csv(f'csvFiles/{fileName}OrderTest')
 
+        # Make a list of the first 10000 primes, for each p in primeList,
+        # loop over these primes and search for a q of order (p - 1)/2.
         fieldList = [self.primes.unrank(i) for i in range(10000)]
         counterexamples = list()
         print(f'Primes: {primeList}')
@@ -301,28 +306,38 @@ class CycloFactExperiment:
         return counterexamples
                         
     
-    def scatterPlot(self, x, y, colors, xlabel, ylabel, title, ylim=None):
+    def scatterPlot(self, x, y, colors, xlabel, ylabel, title, ylim=None, savefig=''):
         """This function makes a scatter plot of {x}, {y} and uses colors in {colors}.
-        Title of the plot is {title}, axis labels are {xlabel} and {ylabel}."""
+        Title of the plot is {title}, axis labels are {xlabel} and {ylabel}.
+        - savefig: file path to save the figure. The figure is only saved when savefig is not
+                    an empty string."""
         # Assert x, y and colors have the same length.
         assert(len(x) == len(y))
         assert(len(y) == len(colors))
         
         # Plot the data
+        fig = plt.figure()
         plt.scatter(x, y, color=colors)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.title(title)
         
-        # Set ylim
+        # Set ylim if it is not None
         if ylim:
             plt.ylim(ylim)
         plt.show()
+        
+        # Save figure is savefig is not empty
+        if savefig:
+            fig.savefig(savefig, bbox_inches='tight')
     
     
-    def plotSparsest(self):
-        """This function plots the cardinality of the field that gave the sparsest factor
-        against the corresponding primes p (p-th cyclotomic polynomial)."""
+    def plotSparsest(self, savefig=''):
+        """This function plots the cardinality of the field F_q that gave the sparsest
+        factor against the corresponding primes p (p-th cyclotomic polynomial factored over F_q).
+        Parameter:
+        - savefig: file path to save the figure. The figure is only saved when savefig is not
+                    an empty string."""
         primes = [p for (p, qMin, minSupp, order) in self.bestCounterExmpls]
         fields = [qMin for (p, qMin, minSupp, order) in self.bestCounterExmpls]
         
@@ -330,16 +345,19 @@ class CycloFactExperiment:
         colors = ['red' if order >= p or minSupp > order else 'green' for (p, qMin, minSupp, order) in self.bestCounterExmpls]
         
         # Plot the data
-        self.scatterPlot(primes, fields, colors, 'Prime', 'Field with lowest sparsity', 'Sparsest counterexamples')
+        self.scatterPlot(primes, fields, colors, 'Prime', 'Field with lowest sparsity',
+                         'Sparsest counterexamples', savefig=savefig)
 
 
-    def plotAll(self, title='All counterexamples', spec=lambda p, q, sparsity, order:True):
-        """This function plots all good field with sparse factors
-        against the corresponding primes p (p-th cyclotomic polynomial).
+    def plotAll(self, title='All counterexamples', spec=lambda p, q, sparsity, order:True, savefig=''):
+        """This function plots the cardinality of all fields F_q that gave counterexmples
+        against the corresponding primes p (p-th cyclotomic polynomial factored over F_q).
         Parameters:
         - title: title of plot.
         - spec: function of p, q, sparsity, and order, returning a boolean indicating whether
                  that counterexample should be plotted. Default: every counterexample is plotted
+        - savefig: file path to save the figure. The figure is only saved when savefig is not
+                    an empty string.
         """
         primes, fields, colors = ([], [], [])
         for (p, q, spars, order) in self.allCounterExmpls:
@@ -347,11 +365,12 @@ class CycloFactExperiment:
                 primes.append(p)
                 fields.append(q)
                 colors.append('red') if order >= p or spars > order else colors.append('green')
-        self.scatterPlot(primes, fields, colors, 'Prime', 'Field with low sparsity', title)
+        self.scatterPlot(primes, fields, colors, 'Prime', 'Field with low sparsity', title, savefig=savefig)
     
 
     def plotStrength(self, ylim=None, strengthFunc=(lambda order, spars, p: order - spars), title=None,
-                     ylabel='$ord_p(q)$ - sparsity', spec=lambda p, qMin, sparsity, order:True):
+                     ylabel='$ord_p(q)$ - sparsity', spec=lambda p, qMin, sparsity, order:True,
+                     savefig=''):
         """This function plots the strength of all counterexamples against the primes p and returns
         a list of all counterexamples, sorted by their strength (descending).
         Parameters:
@@ -361,6 +380,8 @@ class CycloFactExperiment:
          - ylabel: should be same formula as strengthFunc in words (as a string)
          - spec: function of p, q, sparsity, and order, returning a boolean indicating whether
                  that counterexample should be plotted. Default: every counterexample is plotted.
+         - savefig: file path to save the figure. The figure is only saved when savefig is not
+                    an empty string.
         """
         prim, strengths, colors = [], [], []
         strengthList = list()
@@ -384,13 +405,14 @@ class CycloFactExperiment:
         # Make plot
         if not title:
             title = 'Strength of all counterexamples plotted against the prime $p$'
-        self.scatterPlot(prim, strengths, colors, 'Prime', f'Strength of counterexample\n{ylabel}', title, ylim)
+        self.scatterPlot(prim, strengths, colors, 'Prime', f'Strength of counterexample\n{ylabel}', title, ylim, savefig=savefig)
         
         # Sort counterexamples on strength and return list.
         strengthList.sort(key=lambda x:x[-1], reverse=True)
         return [(p, q, sparsity, order, strength, p - 1 - order) for (p, q, sparsity, order, strength) in strengthList]
 
 
+# -------------------------- STRENGTH ANALYSIS CLASS --------------------------
 class StrengthAnalysis:
     """This class implements functions to analyse the strength of a given
     list of counterexamples (sorted on strength)."""
@@ -399,7 +421,8 @@ class StrengthAnalysis:
         Parameters:
             - cycloFact: CycloFactExperiment object
             - strengthList: a list of tuples (p, q, sparsity, order, strength, p - 1 - order)
-                            sorted from highest strength to lowest strength.
+                            sorted from highest strength to lowest strength
+                            (e.g., output of cycloFact.plotStrength()).
         Attributes:
             - self.cycloFact, self.strengthList (same as parameters above)
             - self.counterFields: dictionary with primes p as keys and list
@@ -576,7 +599,7 @@ class StrengthAnalysis:
           2. Primes p with ord_p(2) < p - 1 and q = 2 is not strongest counterexamle
           3. Primes p with ord_p(2) = p - 1.
         The function returns three lists of strongest counterexamples of the prime p,
-        one least for each category.
+        one list for each category.
         """
         blStrongest = list()
         blNotStrongest = list()
