@@ -16,6 +16,7 @@ For my bachelor's thesis in mathematics and computer science, I studied the appl
 
 #### 'images/'
 - overviewThesis.png: the image used above
+- contains all plots used in thesis (results of the notebooks)
 
 #### 'csvFiles/'
 - results of 30+ hours of cyclotomic polynomial factorisations (see the notebooks above for more details).
