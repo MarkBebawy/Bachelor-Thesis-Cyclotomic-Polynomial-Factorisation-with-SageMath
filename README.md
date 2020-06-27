@@ -35,8 +35,8 @@ of the message length.
 Matching vector codes are currently the best-known LDCs and these constructions
 have been used in a recent paper by Jop Bri\"et and Farrokh Labib
 to refute a conjecture from additive combinatorics. Roughly, this conjecture
-says that `dual functions' from $\FF_p^n$ to $\CC$ can
-be approximated well in terms of `polynomial phase functions' in the
+says that 'dual functions' from $\FF_p^n$ to $\CC$ can
+be approximated well in terms of 'polynomial phase functions' in the
 $L^\infty$-norm. As such, we study an application of computer science to additive
 combinatorics, whereas typically, applications go in the opposite direction.
 The conjecture has strong connections to a stochastic refinement
