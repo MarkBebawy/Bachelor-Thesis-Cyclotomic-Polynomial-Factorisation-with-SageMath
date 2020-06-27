@@ -258,10 +258,12 @@ class CycloFactExperiment:
         return self.bestCounterExmpls, self.allCounterExmpls
     
     
-    def searchHighOrder(self, read=None, fileName=None, primeList=None):
+    def searchHighOrder(self, read=None, fileName=None, primeList=None, breakAfterFail=True):
         """For each prime p in primeList, this function loops over the first
         10.000 primes for q and factors the p-th cyclotomic polynomial over
-        F_q, for the smallest q of order (p - 1)/2."""
+        F_q, for the smallest q of order (p - 1)/2. The parameter {breakAfterFail}
+        indicates whether the loop stops for a failed case or whether it continues
+        to search for larger q of order (p - 1)/2 that does give a counterexample."""
         if read is None:
             read = self.read
         if fileName is None:
@@ -276,6 +278,7 @@ class CycloFactExperiment:
         # loop over these primes and search for a q of order (p - 1)/2.
         fieldList = [self.primes.unrank(i) for i in range(10000)]
         counterexamples = list()
+        failCases = list()
         print(f'Primes: {primeList}')
 
         for p in primeList:
@@ -295,14 +298,29 @@ class CycloFactExperiment:
                         print(f'Found counterexample! Prime q = {q} has order = {order} in (F_p)^* for p = {p}.')
                         print('---------------------------------------------------------')
                         counterexamples.append((p, q, minSupp, order))
+
+                        # Break if strength is strictly positive
+                        if minSupp < order:
+                            break
                     else:
+                        failCases.append((p, q, minSupp, order, factors))
                         print(f'PAY ATTENTION: Prime p = {p} and prime q = {q} gives order = {order}, but')
                         print(f'gives no counterexample when factoring. Sparsity = {minSupp}, factors w/ sparsity = {factors}')
                         print('---------------------------------------------------------')
-                    break
+                    if breakAfterFail:
+                        break
         
         # Write results to file
         self.write_csv(f'csvFiles/{fileName}OrderTest', counterexamples)
+        with open(f'csvFiles/{fileName}OrderTestFAILS.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+
+            # Add titles
+            titles = ['p-th Cyclo pol', '#F_q (pol factored over F_q)', 'sparsity',
+                      'ord_p(q)', 'Factors', 'sparsity <= ord_p(q)?']
+            writer.writerow(titles)
+            for (p, qMin, minSup, order, factors) in failCases:
+                writer.writerow([p, qMin, minSup, order, factors, minSup <= order and order < p])
         return counterexamples
                         
     
