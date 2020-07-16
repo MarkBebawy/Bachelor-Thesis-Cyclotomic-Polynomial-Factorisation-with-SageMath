@@ -1,6 +1,6 @@
 # Bachelor Thesis Mathematics & Computer Science: Higher-order Fourier analysis and Locally Decodable Codes
 ## Cyclotomic Polynomial Factorisation with SageMath
-Read the thesis: [URL], to appear.
+Read the thesis: https://scripties.uba.uva.nl/search?id=715281;setlang=en
 
 For my bachelor's thesis in mathematics and computer science, I studied the applications of locally decodable codes to additive combinatorics and I analysed a recent refutation of a conjecture from higher-order Fourier analysis concerning dual functions and their approximations in terms of polynomial phase functions. This code constitutes my contributions to this refutation, as cyclotomic polynomial factorisation is tightly linked to the search for stronger and more general counterexamples. My results motivated the conjecture that there are counterexamples for all prime numbers strictly larger than 5.
 
